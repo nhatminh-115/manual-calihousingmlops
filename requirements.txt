@@ -1,0 +1,6 @@
+pandas
+scikit-learn
+mlflow
+supabase
+Flask
+gunicorn
