@@ -10,7 +10,7 @@ def test_data_ingestion_shape():
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
-    with app.test_client() as client:
+    with app.test_client() as client: 
         yield client
 
 def test_predict_endpoint(client):
