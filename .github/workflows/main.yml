@@ -100,6 +100,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY}}
           envs: SUPABASE_URL, SUPABASE_KEY, MLFLOW_TRACKING_URI, MLFLOW_TRACKING_USERNAME, MLFLOW_TRACKING_PASSWORD, DOCKERHUB_USERNAME
           script: |
+            echo "Wating for Docker to finished installing..."
+            cloud-init status --wait
+            sudo systemctl start docker || true
             sudo docker pull $DOCKERHUB_USERNAME/cali-housing-app:latest
             sudo docker stop cali-app || true
             sudo docker rm cali-app || true
