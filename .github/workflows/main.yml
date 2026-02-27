@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 1.SSH into EC2 and Run Docker
-        uses: appleboy/ssh-actions@v1.0.3
+        uses: appleboy/ssh-action@v1.0.3
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
