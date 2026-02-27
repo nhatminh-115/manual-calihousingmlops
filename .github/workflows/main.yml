@@ -55,6 +55,8 @@ jobs:
   Infrastructure-Provisioning:
     needs: Docker-Packaging
     runs-on: ubuntu-latest
+    outputs:
+      ec2_ip: ${{ steps.get_ip.outputs.SERVER_IP}}
     defaults:
       run:
         working-directory: ./terraform
@@ -75,3 +77,37 @@ jobs:
         run: terraform init
       - name: 5. Terraform apply
         run: terraform apply -auto-approve
+      - name: 6. Get EC2 IP
+        id: get_ip
+        run: echo "SERVER_IP=$(terraform output -raw server_public_ip)" >> $GITHUB_OUTPUT
+        
+  Continuous-Development:
+    needs: Infrastructure-Provisioning
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1.SSH into EC2 and Run Docker
+        uses: appleboy/ssh-actions@v1.0.3
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        with:
+          host: ${{ needs.Infrastructure-Provisioning.outputs.ec2_ip}} 
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY}}
+          envs: SUPABASE_URL, SUPABASE_KEY, MLFLOW_TRACKING_URI, MLFLOW_TRACKING_USERNAME, MLFLOW_TRACKING_PASSWORD, DOCKERHUB_USERNAME
+          scripts: |
+            sudo docker pull $DOCKERHUB_USERNAME/cali-housing-app:latest
+            sudo docker stop cali-app || true
+            sudo docker rm cali-app || true
+            sudo docker run -d -p 5000:5000 --name cali-app \
+              -e SUPABASE_URL=$SUPABASE_URL \
+              -e SUPABASE_KEY=$SUPABASE_KEY \
+              -e MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI \
+              -e MLFLOW_TRACKING_USERNAME=$MLFLOW_TRACKING_USERNAME \
+              -e MLFLOW_TRACKING_PASSWORD=$MLFLOW_TRACKING_PASSWORD \
+              $DOCKERHUB_USERNAME/cali-housing-app:latest
+        
