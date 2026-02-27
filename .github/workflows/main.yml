@@ -70,7 +70,7 @@ jobs:
       - name: 3. Setup terraform
         uses: hashicorp/setup-terraform@v2
         with: 
-          terraform-wrapper: False
+          terraform_wrapper: False
       - name: 4. Terraform init 
         run: terraform init
       - name: 5. Terraform apply
