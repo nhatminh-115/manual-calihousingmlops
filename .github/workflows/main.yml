@@ -33,7 +33,7 @@ jobs:
 
        run: |
          pytest test_pipeline.py -v
-  Continuous-Delivery:
+  Docker-Packaging:
     needs: Continuous-Integration
     runs-on: ubuntu-latest
     steps:
@@ -52,4 +52,26 @@ jobs:
           tags: | 
             ${{ secrets.DOCKERHUB_USERNAME}}/cali-housing-app:latest
             ${{ secrets.DOCKERHUB_USERNAME}}/cali-housing-app:${{ github.sha }}
-          
+  Infrastructure-Provisioning:
+    needs: Docker-Packaging
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+    steps:
+      - name: 1. Check out code
+        uses: actions/checkout@v3
+      - name: 2. Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key-id: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID}}
+          aws-region: us-east-1
+      - name: 3. Setup terraform
+        uses: hashicorp/setup-terraform@v2
+        with: 
+          terraform-wrapper: False
+      - name: 4. Terraform init 
+        run: terraform init
+      - name: 5. Terraform apply
+        run: terraform apply -auto-approve
