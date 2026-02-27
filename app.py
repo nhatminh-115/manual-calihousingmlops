@@ -6,7 +6,7 @@ from supabase import create_client, Client
 import mlflow.pyfunc
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
- 
+
 app = Flask(__name__)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
