@@ -27,8 +27,9 @@ jobs:
          pip install pytest
      - name: 4. Run Pytest
        env:
-         SUPABASE_URL: "https://mock-url.supabase.co"
-         SUPABASE_KEY: "mock-key"
-         MLFLOW_TRACKING_URI: "https://mock-uri"
+         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+         MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+
        run: |
          pytest test_pipeline.py -v
