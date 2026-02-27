@@ -4,3 +4,13 @@ __pycache__/
 .env
 mlflow.db
 .pytest_cache/
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
