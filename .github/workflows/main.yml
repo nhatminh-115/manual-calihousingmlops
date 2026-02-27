@@ -3,7 +3,13 @@ name: MLOps CI/CD Pipeline
 on: 
   push:
     branches:
-    - main
+      - main
+    paths-ignore:
+      - 'REAME.md'
+      - '.github/workflows/**' 
+      - 'docs/**'              
+      - '.gitignore'
+      - '.dockerignore'
 
 jobs:
   Continuous-Integration:
