@@ -11,7 +11,7 @@ def test_data_ingestion_shape():
 def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
-        yield client 
+        yield client
 
 def test_predict_endpoint(client):
     mock_payload = {
