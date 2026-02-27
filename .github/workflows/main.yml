@@ -33,3 +33,23 @@ jobs:
 
        run: |
          pytest test_pipeline.py -v
+  Continuous-Delivery:
+    needs: Continuous-Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Check out code
+        uses: actions/checkout@v3
+      - name: 2. Login to Docker Hub
+        uses: docker/login-action@v2
+        with: 
+          username: ${{ secrets.DOCKERHUB_USERNAME}}
+          password: ${{ secrets.DOCKERHUB_TOKEN}}
+      - name: 3. Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: | 
+            ${{ secrets.DOCKERHUB_USERNAME}}/cali-housing-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME}}/cali-housing-app:${{ github.sha }}
+          
